@@ -1,23 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-import requests
-import time
-
-
-# In[ ]:
-
+import os
 
 KEY_ORCHES = "74240dc9-407d-44c7-83c4-4b8a489755d9"
-
-
-# In[ ]:
-
-
-import os
 
 # Set the directory path
 directory = input('input directory: ')    #'D:\Deivison\music_vocal'
@@ -26,15 +9,11 @@ output_path = input('output directory: ') #'D:\Deivison\music_vocal_output'
 # Get all the files in the directory
 files = os.listdir(directory)
 
-# Filter the files to only include those with a .wav extension
+# Filter the files to only include those with a .m4a extension
 
-mp4_files = [f for f in files if f.endswith('.m4a')]
+mp4_files = [f for f in files if f.endswith('.m4a')] # <- in case of another extension, change here.
 
 print(mp4_files)
-
-
-# In[ ]:
-
 
 import dropbox
 import requests
@@ -42,7 +21,7 @@ import json
 from pathlib import Path
 import yaml
 
-DROPBOX_PATH = "dropbox.yaml"
+DROPBOX_PATH = "dropbox.yaml" # credenciais em .yaml de um dropbox para fazer uploads os inputs
 class UploadData:
     def __init__(self, access_token):
         self.dbx = dropbox.Dropbox(oauth2_access_token=access_token["acess_token"], app_key =access_token["app_key"], app_secret = access_token["app_secret"], oauth2_refresh_token = access_token["refresh_token"])
@@ -105,9 +84,6 @@ def delete_dropbox(path):
         return "erro"
 
 
-# In[ ]:
-
-
 def generate(FILE_NAME, LINK, KEY_ORCHES):
 
     # POST
@@ -120,7 +96,7 @@ def generate(FILE_NAME, LINK, KEY_ORCHES):
     }
     payload_orches = {
         "name": FILE_NAME,
-        "workflow": "remover_instrumental_123", #remover_instrumental_123
+        "workflow": "remover_instrumental_123", #remover_instrumental_123 é meu workflow na API da moises
         "params": {"inputUrl": LINK}
     }
     print("We are going..")
@@ -165,9 +141,6 @@ def generate(FILE_NAME, LINK, KEY_ORCHES):
         except:
             time.sleep(10)
             continue
-
-
-# In[ ]:
 
 
 from urllib import request
