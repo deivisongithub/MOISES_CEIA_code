@@ -76,11 +76,16 @@ import numpy as np
 
 def speech_and_silence(audio_path,save_temp_path):
 
+  # get the vad model and utils
   model_and_utils = get_vad_model_and_utils(use_cuda=False)
+
+  # get the speech timestamps
   speech_frames = return_speech_segments(model_and_utils, audio_path, vad_sample_rate=8000, use_cuda=False)
 
+  # get the sampling rate of original audio
   _ , sr_audio_original = read_audio(audio_path)
 
+  # load the original audio
   wav_src_all, _ = librosa.load(audio_path, sr=sr_audio_original)
 
   if not speech_frames:
@@ -95,14 +100,14 @@ def speech_and_silence(audio_path,save_temp_path):
 
           if i == 0:
               if start != 0:
-                  slice_audios.append(wav_src_all[: speech_frames[i+1]["start"]])
+                  slice_audios.append(wav_src_all[: speech_frames[i+1]["start"]]) # in case of the fist speech  (silence + speech + silence)
           else: # normal samples
 
               if i != len(speech_frames)-1:
-                  next_start = speech_frames[i+1]["start"]
-                  slice_audios.append(wav_src_all[start:next_start])
+                  next_start = speech_frames[i+1]["start"]              # start of the next detected speech timestamp defined by vad
+                  slice_audios.append(wav_src_all[start:next_start])    # the segment is the start of current speech until the next start speech(speech + silence)
               else:
-                slice_audios.append(wav_src_all[start:])
+                slice_audios.append(wav_src_all[start:]) # the last is the start speech until end of audio
 
       except Exception as e:
           print(e)
@@ -110,20 +115,22 @@ def speech_and_silence(audio_path,save_temp_path):
 
   for i in range(len(slice_audios)):
     segmented_audio = slice_audios[i]
-    write(save_temp_path + '/' + 'segment_' + str(i) + '.wav', sr_audio_original, segmented_audio)
+    write(save_temp_path + '/' + 'segment_' + str(i) + '.wav', sr_audio_original, segmented_audio) # save all segments in path
   
-  return slice_audios
+  return slice_audios # return a list with all segments
 
 def concatenate_segments(segments,save_path,sr_audio):
-    audio = np.concatenate(segments)
-    write(save_path + '/' + 'full_audio' + '.wav' , sr_audio, audio)
-    print("All audio is saved at:", save_path)
-    return audio
+  #concatenate segments
+  audio = np.concatenate(segments)
+  #save full audio
+  write(save_path + '/' + 'full_audio' + '.wav' , sr_audio, audio)
+  print("All audio is saved at:", save_path)
+  return audio
 
 audio_path = input('wav file path: ')                   #/content/drive/MyDrive/music_segments/input/Coldplay_Paradise.wav
-save_segments_path = input('save segments path: ')      #/content/drive/MyDrive/music_segments/output
+save_segments_path = input('save segments path: ')      #/content/drive/MyDrive/TEST BASE/music_segments/segmented_music
 save_path = input('save path: ')                        #/content/drive/MyDrive/music_segments/output
 
-_ , sr_audio = read_audio(audio_path)
+_ , sr_audio = read_audio(audio_path) # get sampling rate
 segments = speech_and_silence(audio_path,save_segments_path)
 full_audio = concatenate_segments(segments,save_path,sr_audio)
