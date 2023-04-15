@@ -21,7 +21,7 @@ import json
 from pathlib import Path
 import yaml
 
-DROPBOX_PATH = "dropbox.yaml" # credenciais em .yaml de um dropbox para fazer uploads os inputs
+DROPBOX_PATH = "/content/drive/MyDrive/TEST BASE/voice_isolation/dropbox.yaml" # credenciais em .yaml de um dropbox para fazer uploads os inputs
 class UploadData:
     def __init__(self, access_token):
         self.dbx = dropbox.Dropbox(oauth2_access_token=access_token["acess_token"], app_key =access_token["app_key"], app_secret = access_token["app_secret"], oauth2_refresh_token = access_token["refresh_token"])
@@ -162,4 +162,3 @@ for i in mp4_files:
     file_url = json_file['Output 1']
     file = output_path + '/' + filename + '.wav'
     request.urlretrieve(file_url , file )
-
