@@ -87,4 +87,4 @@ output path: C:\Users\Deivison\Desktop\MOISES\pipeline\output
 ```
 
 Output Example:
-![image](https://uploaddeimagens.com.br/imagens/Tf_sQfg)
+![outoutexample](https://github.com/deivisongithub/MOISES_CEIA_code/assets/81170028/d2e27396-6b91-41e9-a845-957dfa1c6661)
