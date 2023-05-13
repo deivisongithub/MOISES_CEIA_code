@@ -87,4 +87,4 @@ output path: C:\Users\Deivison\Desktop\MOISES\pipeline\output
 ```
 
 Output Example:
-
+![image](https://user-images.githubusercontent.com/16432329/230908037-127becb9-ed2a-41b5-8ac6-c9791ec2f7c7.png)
