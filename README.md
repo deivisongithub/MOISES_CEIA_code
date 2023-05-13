@@ -69,6 +69,8 @@ $ pip install -r requirements.txt
 
 ## How to use
 
+It is very important that all .py and .yaml are in the same directory.
+
 To execute the audio processing pipeline, run the following command:
 
 ```bash
