@@ -78,7 +78,7 @@ CHANGE THE PARAMETRE 'segments' PER 'new speaker segments' OF NEXT FUNCTION
 
 '''
 # Concatenate segments
-full_audio = concatenate_segments(segments,concatenate_segments_path,sr_audio)
+full_audio = concatenate_segments(segments,concatenate_segments_path,sr_audio,filename)
 
 
 #mixer voice and background

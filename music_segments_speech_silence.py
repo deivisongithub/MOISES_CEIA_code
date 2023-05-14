@@ -118,10 +118,10 @@ def speech_and_silence(audio_path,save_temp_path):
   
   return slice_audios # return a list with all segments
 
-def concatenate_segments(segments,save_path,sr_audio):
+def concatenate_segments(segments,save_path,sr_audio,file_name):
   #concatenate segments
   audio = np.concatenate(segments)
   #save full audio
-  write(save_path + '/' + 'full_audio' + '.wav' , sr_audio, audio)
+  write(save_path + '/' + file_name + 'full_audio' + '.wav' , sr_audio, audio)
   print("All audio is saved at:", save_path)
   return audio
