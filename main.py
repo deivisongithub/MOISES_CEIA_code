@@ -6,6 +6,9 @@ from music_segments_speech_silence import *
 do_segment = input('--do_segment[True/False]: ')
 do_concatenate = input('--do_concatenate[True/False]: ')
 
+if do_segment == 'True':
+    do_concatenate = 'False'
+
 
 KEY_ORCHES = "74240dc9-407d-44c7-83c4-4b8a489755d9"
 DROPBOX_PATH = "dropbox.yaml"  # # .yaml credentials of a dropbox to upload inputs
