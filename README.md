@@ -25,6 +25,7 @@ This script requires the following libraries:
 - colorama==0.4.6
 - decorator==5.1.1
 - dropbox==11.36.0
+- ffmpeg-python==0.2.0
 - filelock==3.12.0
 - idna==3.4
 - Jinja2==3.1.2
@@ -42,6 +43,7 @@ This script requires the following libraries:
 - ply==3.11
 - pooch==1.6.0
 - pycparser==2.21
+- pydub==0.25.1
 - pytube==15.0.0
 - PyYAML==6.0
 - requests==2.30.0
@@ -76,16 +78,27 @@ To execute the audio processing pipeline, run the following command:
 ```bash
 $ python main.py
 ```
-After that just give the required parameters in the terminal:
+After that just give the required parameters in the terminal,Example:
 
 ```bash
-Video Link: 
-output path: 
+--do_segment[True/False]: True
+--do_concatenate[True/False]: False
+output path: C:\Users\Deivison\Desktop\MOISES\pipeline\output
 ```
-Example:
+In case, do_segment == 'TRUE':
+
+provide the youtube link,Example:
+
 ```bash
 Video Link: https://www.youtube.com/watch?v=ZEcqHA7dbwM
-output path: C:\Users\Deivison\Desktop\MOISES\pipeline\output
+```
+In case, do_concatenate == 'TRUE':
+
+provide folders with segments and background music,Example:
+
+```bash
+modified segments path: /home/deivison/Desktop/pipeline_final/output/segments
+isolated background path: /home/deivison/Desktop/pipeline_final/output/isolated_background
 ```
 
 Output Example:
