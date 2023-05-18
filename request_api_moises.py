@@ -80,7 +80,7 @@ def moises_isolate_voice(FILE_NAME, LINK, KEY_ORCHES):
     }
     payload_orches = {
         "name": FILE_NAME,
-        "workflow": "remover_instrumental_123", #remover_instrumental_123 é meu workflow na API da moises
+        "workflow": "remover_instrumental_123", #remover_instrumental_123 is my workflow on MOISES API
         "params": {"inputUrl": LINK}
     }
     print("We are going..")
@@ -121,6 +121,9 @@ def moises_isolate_voice(FILE_NAME, LINK, KEY_ORCHES):
                 #with open(f"{output_path}/{FILE_NAME}_vocal.json", 'w') as file:
                 #    json.dump(final_json, file)
                 return final_json
+            if(response_orches['status'] == "FAILED"):
+                print('---ISOLATION FAILED---')
+                return 0
 
         except:
             time.sleep(10)
@@ -166,6 +169,9 @@ def moises_mixer_audios(LINK, LINK2,KEY):
                 response = response_orches_get['result']['Output 1']
 
                 return response
+            if(response_orches_get['status'] == "FAILED"):
+                print('---MIX FAILED---')
+                return 0
         except:
             time.sleep(1)
             continue

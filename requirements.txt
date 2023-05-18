@@ -6,6 +6,7 @@ charset-normalizer==3.1.0
 colorama==0.4.6
 decorator==5.1.1
 dropbox==11.36.0
+ffmpeg-python==0.2.0
 filelock==3.12.0
 idna==3.4
 Jinja2==3.1.2
@@ -23,6 +24,7 @@ packaging==23.1
 ply==3.11
 pooch==1.6.0
 pycparser==2.21
+pydub==0.25.1
 pytube==15.0.0
 PyYAML==6.0
 requests==2.30.0

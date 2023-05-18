@@ -125,3 +125,10 @@ def concatenate_segments(segments,save_path,sr_audio,file_name):
   write(save_path + '/' + file_name + 'full_audio' + '.wav' , sr_audio, audio)
   print("All audio is saved at:", save_path)
   return audio
+
+def sr_conversion(input_filepath,output_filepath,target_sr):
+
+    waveform, sr = librosa.load(input_filepath, sr=None)
+    target_waveform = librosa.resample(waveform, orig_sr=sr, target_sr=target_sr)
+    sf.write(output_filepath, target_waveform, target_sr, format='wav')
+    print(f'SAMPLING RATE CHANGED TO {target_sr}')
