@@ -71,7 +71,8 @@ $ pip install -r requirements.txt
 
 ## How to use
 
-It is very important that all .py and .yaml are in the same directory.
+It is very important that all .py and .yaml are in the same directory. 
+available in:https://drive.google.com/file/d/1sWZJub-SbwnDXSFF5qSVfNsVIM9jAAxy/view?usp=share_link
 
 To execute the audio processing pipeline, run the following command:
 
