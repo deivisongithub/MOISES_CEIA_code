@@ -97,7 +97,7 @@ def moises_isolate_voice(FILE_NAME, LINK, KEY_ORCHES):
                 print('Post Loaded. IDs:', id_orches)
                 break
         except:
-            time.sleep(10)
+            time.sleep(5)
             continue
 
     # GET
@@ -126,7 +126,7 @@ def moises_isolate_voice(FILE_NAME, LINK, KEY_ORCHES):
                 return 0
 
         except:
-            time.sleep(10)
+            time.sleep(5)
             continue
 
 def moises_mixer_audios(LINK, LINK2,KEY):

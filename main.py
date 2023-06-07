@@ -61,7 +61,7 @@ if do_segment == 'True':
 
         os.remove(Youtube_music_path_m4a)
 
-        #change SR
+        #change SR to 16K
         Youtube_music_path_wav = Youtube_music_path + "/" + filename + '.wav'
         sr_conversion(Youtube_music_path_wav,Youtube_music_path_wav,SAMPLING_RATE)
 
@@ -70,7 +70,7 @@ if do_segment == 'True':
         print(url)
 
         json_file = moises_isolate_voice(filename, url, KEY_ORCHES)
-        print(json_file)
+        #print(json_file)
 
         delete_dropbox(path, DROPBOX_PATH)
 
@@ -85,13 +85,16 @@ if do_segment == 'True':
         request.urlretrieve(file_url, file)
         request.urlretrieve(file_url2, file2)
 
-    # Make voice + silence segments
+    #change output moises api SR to 16K
+    sr_conversion(file,file,SAMPLING_RATE)
+
+    # Make voice segments
     audio_path = os.listdir(isolated_voice_path)[0]
     audio_path = os.path.join(isolated_voice_path, audio_path)
     print('making the segments...')
 
     _, sr_audio = read_audio(audio_path)  # get sampling rate
-    segments = speech_and_silence(audio_path, segments_path)
+    segments = speech_and_silence(audio_path, segments_path,filename)
 
 
 if do_concatenate == 'True':
@@ -103,7 +106,7 @@ if do_concatenate == 'True':
     # Get the segments
     n_segments = len(os.listdir(modified_segments_path))
     modified_segments_list = [f'segment_{str(i)}.wav' for i in range(n_segments)]
-    print(modified_segments_list)
+    #print(modified_segments_list)
 
     # get sampling rate
     _, sr_audio = read_audio(os.path.join(
