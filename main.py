@@ -25,72 +25,63 @@ if do_segment == 'True':
     isolated_voice_path = os.path.join(output_path, 'isolated_voice')
     isolated_background_path = os.path.join(output_path, 'isolated_background')
     segments_path = os.path.join(output_path, 'segments')
+    Youtube_music_path = os.path.join(output_path, 'youtube_music')
 
     # make the directorys
-    path_list = [isolated_voice_path, isolated_background_path, segments_path]
+    path_list = [Youtube_music_path, isolated_voice_path, isolated_background_path, segments_path]
 
     for folder in path_list:
-        try:
+        if os.path.isdir(folder):
+            print ('---this directory already exists---')
+        else:
             os.mkdir(folder)
-        except FileExistsError as e:
-            print(f'The {folder} folder already exists')
 
     # download the audio of youtube video
-    Youtube_music_path = os.path.join(output_path, 'youtube_music')
     print('starting download...')
-    download_music_youtube(LINK_VIDEO, Youtube_music_path)
+    #get file name
+    filename = download_music_youtube(LINK_VIDEO, Youtube_music_path)
 
     # isolate the voice and background
 
-    # Get all the files in the directory
-    files = os.listdir(Youtube_music_path)
+    Youtube_music_path_m4a = os.path.join(Youtube_music_path, filename + '.m4a')
+    print(Youtube_music_path_m4a)
+    Youtube_music_path_wav = Youtube_music_path + "/" + filename + '.wav'
+    print(Youtube_music_path_wav)
 
-    for i in files:
-        #get file name
-        filename = os.path.splitext(i)[0]
-        print(filename)
+    #m4a to wav
+    sound = AudioSegment.from_file(Youtube_music_path_m4a)
+    sound.export(Youtube_music_path_wav, format="wav")
 
-        Youtube_music_path_m4a = os.path.join(Youtube_music_path, i)
-        print(Youtube_music_path_m4a)
-        Youtube_music_path_wav = Youtube_music_path + "/" + filename + '.wav'
-        print(Youtube_music_path_wav)
+    os.remove(Youtube_music_path_m4a)
 
-        #m4a to wav
-        sound = AudioSegment.from_file(Youtube_music_path_m4a)
-        sound.export(Youtube_music_path_wav, format="wav")
+    #change SR to 16K
+    sr_conversion(Youtube_music_path_wav,Youtube_music_path_wav,SAMPLING_RATE)
 
-        os.remove(Youtube_music_path_m4a)
+    url, path = dropbox_generator(
+        Youtube_music_path_wav, DROPBOX_PATH)
+    print(url)
 
-        #change SR to 16K
-        Youtube_music_path_wav = Youtube_music_path + "/" + filename + '.wav'
-        sr_conversion(Youtube_music_path_wav,Youtube_music_path_wav,SAMPLING_RATE)
+    json_file = moises_isolate_voice(filename, url, KEY_ORCHES)
+    #print(json_file)
 
-        url, path = dropbox_generator(
-            Youtube_music_path_wav, DROPBOX_PATH)
-        print(url)
+    delete_dropbox(path, DROPBOX_PATH)
 
-        json_file = moises_isolate_voice(filename, url, KEY_ORCHES)
-        #print(json_file)
+    # downloading and storing isolated voice and background
+    print('Download files...')
+    file_url = json_file['Output 1']
+    file_url2 = json_file['Output 2']
 
-        delete_dropbox(path, DROPBOX_PATH)
+    file = os.path.join(isolated_voice_path, filename + '.wav')
+    file2 = os.path.join(isolated_background_path,filename + '_background' + '.wav')
 
-        # downloading and storing isolated voice and background
-        print('Download files...')
-        file_url = json_file['Output 1']
-        file_url2 = json_file['Output 2']
-
-        file = os.path.join(isolated_voice_path, filename + '.wav')
-        file2 = os.path.join(isolated_background_path,filename + '_background' + '.wav')
-
-        request.urlretrieve(file_url, file)
-        request.urlretrieve(file_url2, file2)
+    request.urlretrieve(file_url, file)
+    request.urlretrieve(file_url2, file2)
 
     #change output moises api SR to 16K
     sr_conversion(file,file,SAMPLING_RATE)
 
     # Make voice segments
-    audio_path = os.listdir(isolated_voice_path)[0]
-    audio_path = os.path.join(isolated_voice_path, audio_path)
+    audio_path = os.path.join(isolated_voice_path, filename + '.wav')
     print('making the segments...')
 
     _, sr_audio = read_audio(audio_path)  # get sampling rate
