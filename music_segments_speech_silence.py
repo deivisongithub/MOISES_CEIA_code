@@ -75,47 +75,49 @@ def return_speech_segments(
 
 def speech_and_silence(audio_path,save_temp_path,music_name):
 
-  # get the vad model and utils
-  model_and_utils = get_vad_model_and_utils(use_cuda=False)
+    # get the vad model and utils
+    model_and_utils = get_vad_model_and_utils(use_cuda=False)
 
-  # get the speech timestamps
-  speech_frames = return_speech_segments(model_and_utils, audio_path, vad_sample_rate=8000, use_cuda=False)
+    # get the speech timestamps
+    speech_frames = return_speech_segments(model_and_utils, audio_path, vad_sample_rate=8000, use_cuda=False)
+    # get the sampling rate of original audio
+    _ , sr_audio_original = read_audio(audio_path)
 
-  # get the sampling rate of original audio
-  _ , sr_audio_original = read_audio(audio_path)
+    # load the original audio
+    wav_src_all, _ = librosa.load(audio_path, sr=sr_audio_original)
 
-  # load the original audio
-  wav_src_all, _ = librosa.load(audio_path, sr=sr_audio_original)
+    if not speech_frames:
+        speech_frames = [{"start":0, "end":len(wav_src_all)-1}]
 
-  if not speech_frames:
-      speech_frames = [{"start":0, "end":len(wav_src_all)-1}]
+    slice_audios = []
+    frame_index = 0
+    for frame in speech_frames:
+        if (frame["end"] - frame["start"]) > 480000: # verified that the segments have a maximum of 30 seconds
+            start_new_frame = ((frame["start"] + frame["end"]) // 2) + 1
+            end_new_frame = frame["end"]
+            speech_frames.insert(frame_index + 1, {"start":start_new_frame,"end":end_new_frame})
 
-  slice_audios = []
-  for i in range(len(speech_frames)):
-      try:
-          start = speech_frames[i]["start"]
-          end = speech_frames[i]["end"]
-          wav_src = wav_src_all[start:end]
+            speech_frames[frame_index] = {"start":frame["start"],"end":start_new_frame - 1}
 
-          slice_audios.append(wav_src_all[speech_frames[i]["start"] - 4000 : speech_frames[i]["end"] + 4000])
+            frame_index += 1
 
-      except Exception as e:
-          print(e)
-          slice_audios.append(np.zeros(wav_src_all[start:end].shape))
+    for frame in speech_frames:
+            
+            slice_audios.append(wav_src_all[frame["start"] : frame["end"]])
 
-  for i in range(len(slice_audios)):
-    segmented_audio = slice_audios[i]
-    write(save_temp_path + '/' + music_name + '_' + str(i) + '.wav', sr_audio_original, segmented_audio) # save all segments in path
-  
-  return slice_audios # return a list with all segments
+    for i in range(len(slice_audios)):
+        segmented_audio = slice_audios[i]
+        write(save_temp_path + '/' + music_name + '_' + str(i) + '.wav', sr_audio_original, segmented_audio) # save all segments in path
+    
+    return slice_audios # return a list with all segments
 
 def concatenate_segments(segments,save_path,sr_audio,file_name):
-  #concatenate segments
-  audio = np.concatenate(segments)
-  #save full audio
-  write(save_path + '/' + file_name + 'full_audio' + '.wav' , sr_audio, audio)
-  print("All audio is saved at:", save_path)
-  return audio
+    #concatenate segments
+    audio = np.concatenate(segments)
+    #save full audio
+    write(save_path + '/' + file_name + 'full_audio' + '.wav' , sr_audio, audio)
+    print("All audio is saved at:", save_path)
+    return audio
 
 def sr_conversion(input_filepath,output_filepath,target_sr):
 
