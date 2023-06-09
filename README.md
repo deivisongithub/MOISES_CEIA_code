@@ -99,10 +99,11 @@ provide folders with segments and background music,Example:
 
 ```bash
 modified segments path: /home/deivison/Desktop/pipeline_final/output/segments
-isolated background path: /home/deivison/Desktop/pipeline_final/output/isolated_background
+isolated background .wav: /home/deivison/MOISES_CEIA_code/output/isolated_background/Fly Me To The Moon_background.wav
+timestamps .json: /home/deivison/MOISES_CEIA_code/output/timestamps/Fly Me To The Moon.json
 ```
 
 Output Example:
 
 
-![outoutexample](https://github.com/deivisongithub/MOISES_CEIA_code/assets/81170028/d2e27396-6b91-41e9-a845-957dfa1c6661)
+![Screenshot from 2023-06-09 13-50-16](https://github.com/deivisongithub/MOISES_CEIA_code/assets/81170028/d226b566-1bde-4dff-a6f6-eab5fbd47e31)
