@@ -95,7 +95,7 @@ Video Link: https://www.youtube.com/watch?v=ZEcqHA7dbwM
 ```
 In case, do_concatenate == 'TRUE':
 
-provide folders with segments and background music,Example:
+provide folders with segments and background .wav path,Example:
 
 ```bash
 modified segments path: /home/deivison/Desktop/pipeline_final/output/segments
