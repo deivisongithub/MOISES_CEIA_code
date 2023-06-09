@@ -104,12 +104,14 @@ def speech_and_silence(audio_path,save_temp_path,music_name):
     for frame in speech_frames:
             
             slice_audios.append(wav_src_all[frame["start"] : frame["end"]])
+    
+    n_slice_audios = len(slice_audios)
 
-    for i in range(len(slice_audios)):
+    for i in range(n_slice_audios):
         segmented_audio = slice_audios[i]
         write(save_temp_path + '/' + music_name + '_' + str(i) + '.wav', sr_audio_original, segmented_audio) # save all segments in path
     
-    return slice_audios # return a list with all segments
+    return slice_audios, speech_frames,n_slice_audios # return a list with all segments
 
 def concatenate_segments(segments,save_path,sr_audio,file_name):
     #concatenate segments

@@ -2,6 +2,7 @@ from pydub import AudioSegment
 from download_audio_youtube import download_music_youtube
 from request_api_moises import *
 from music_segments_speech_silence import *
+import json
 
 do_segment = input('--do_segment[True/False]: ')
 do_concatenate = input('--do_concatenate[True/False]: ')
@@ -26,9 +27,10 @@ if do_segment == 'True':
     isolated_background_path = os.path.join(output_path, 'isolated_background')
     segments_path = os.path.join(output_path, 'segments')
     Youtube_music_path = os.path.join(output_path, 'youtube_music')
+    timestamps_path = os.path.join(output_path, 'timestamps')
 
     # make the directorys
-    path_list = [Youtube_music_path, isolated_voice_path, isolated_background_path, segments_path]
+    path_list = [Youtube_music_path, isolated_voice_path, isolated_background_path, segments_path,timestamps_path]
 
     for folder in path_list:
         if os.path.isdir(folder):
@@ -85,35 +87,61 @@ if do_segment == 'True':
     print('making the segments...')
 
     _, sr_audio = read_audio(audio_path)  # get sampling rate
-    segments = speech_and_silence(audio_path, segments_path,filename)
+
+    segments,timestamps,n_segments = speech_and_silence(audio_path, segments_path,filename)
+
+    dict_timestamps = {'timestamps':timestamps,'num_segments':n_segments, 'file_name':filename}
+
+    #make a json with timestamps and number of segments
+    with open(timestamps_path  + '/' + filename + '.json', 'w') as fp:
+        json.dump(dict_timestamps, fp)
 
 
 if do_concatenate == 'True':
 
     # input
     modified_segments_path = input('modified segments path: ')
-    isolated_background_path = input('isolated background path: ')
+    isolated_background_wav = input('isolated background .wav: ')
+    timestamps_json = input('timestamps .json: ')
 
-    # Get the segments
-    n_segments = len(os.listdir(modified_segments_path))
-    modified_segments_list = [f'segment_{str(i)}.wav' for i in range(n_segments)]
-    #print(modified_segments_list)
 
-    # get sampling rate
-    _, sr_audio = read_audio(os.path.join(
-        modified_segments_path, modified_segments_list[0]))
-
-    segments = []
-
-    for segment in modified_segments_list:
-        audio_segment_temp, _ = read_audio(
-            os.path.join(modified_segments_path, segment))
-        segments.append(audio_segment_temp)
+    #get timestamps
+    with open(timestamps_json, 'r') as fp:
+        data = json.load(fp)
 
     # Get name of song
 
-    filename = os.path.splitext(os.listdir(isolated_background_path)[0])[0]
-    filename = filename.split('_')[0]
+    filename = data['file_name']
+
+    # Get the segments
+    timestamps = data['timestamps']
+    n_segments = data['num_segments']
+
+    concatene_list = []
+    for i in range(n_segments):
+
+        if i == 0:
+            try:
+                concatene_list.append(np.zeros(timestamps[i]['start'] - 1))
+                speech_segment,_ = read_audio(modified_segments_path + '/' + filename + '_' + str(i) + '.wav')
+                concatene_list.append(speech_segment)
+                concatene_list.append(np.zeros(timestamps[i+1]['start'] - timestamps[i]['end']))
+
+            except:
+                speech_segment,_ = read_audio(modified_segments_path + '/' + filename + '_' + str(i) + '.wav')
+                concatene_list.append(speech_segment)
+                concatene_list.append(np.zeros(timestamps[i+1]['start'] - timestamps[i]['end']))
+
+            continue
+
+        else:
+            if i < n_segments - 1:
+                speech_segment,_ = read_audio(modified_segments_path + '/' + filename + '_' + str(i) + '.wav')
+                concatene_list.append(speech_segment)
+                concatene_list.append(np.zeros(timestamps[i+1]['start'] - timestamps[i]['end']))
+            else:
+                speech_segment,_ = read_audio(modified_segments_path + '/' + filename + '_' + str(i) + '.wav')
+                concatene_list.append(speech_segment)
 
     # Set the directory path
     concatenate_segments_path = os.path.join(output_path, 'concatenate_segments')
@@ -123,26 +151,23 @@ if do_concatenate == 'True':
     path_list = [concatenate_segments_path, new_speaker_path]
 
     for folder in path_list:
-        try:
+        if os.path.isdir(folder):
+            print ('---this directory already exists---')
+        else:
             os.mkdir(folder)
-        except FileExistsError as e:
-            print(f'The {folder} folder already exists')
 
     # Concatenate segments
-    full_audio = concatenate_segments(
-        segments, concatenate_segments_path, sr_audio, filename)
+    full_audio = concatenate_segments(concatene_list, concatenate_segments_path, SAMPLING_RATE, filename)
 
     # mixer voice and background
 
-    new_voice_path = os.listdir(concatenate_segments_path)[0]
-    new_voice_path = os.path.join(concatenate_segments_path, new_voice_path)
+    new_voice_path = os.path.join(concatenate_segments_path, filename + 'full_audio' + '.wav')
     print(new_voice_path)
 
-    audio_background_path = os.listdir(isolated_background_path)[0]
-    audio_background_path = os.path.join(isolated_background_path, audio_background_path)
+    audio_background_path = isolated_background_wav
     print(audio_background_path)
 
-    #verify if are with same sr
+    #verify if have the same sr
     _,sr_concatenate = read_audio(new_voice_path)
     _,sr_background = read_audio(audio_background_path)
 
