@@ -94,6 +94,9 @@ if do_segment == 'True':
 
     _, sr_audio = read_audio(audio_path)  # get sampling rate
 
+    #change filename
+    filename = 'segment'
+
     segments, timestamps, n_segments = speech_and_silence(
         audio_path, segments_path, filename)
 
